@@ -1,21 +1,38 @@
-FROM php:8.2-apache
+FROM php:8.2-fpm-alpine
 
-# Install PHP MySQL extension
-RUN docker-php-ext-install pdo pdo_mysql
+# Install nginx and required PHP extensions
+RUN apk add --no-cache nginx && \
+    docker-php-ext-install pdo pdo_mysql
 
-# Enable mod_rewrite for .htaccess routing
-RUN a2enmod rewrite
+# Write nginx config
+RUN mkdir -p /run/nginx && \
+    cat > /etc/nginx/http.d/default.conf << 'NGINX'
+server {
+    listen ${PORT:-80};
+    root /var/www/html;
+    index index.html index.php;
 
-# Copy all app files to web root
+    location / {
+        try_files $uri $uri/ =404;
+    }
+
+    location ~ ^/api/ {
+        rewrite ^/api/(.*)$ /api.php last;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}
+NGINX
+
+# Copy app files
 COPY . /var/www/html/
-
-# Set permissions
 RUN chown -R www-data:www-data /var/www/html
 
-# Allow .htaccess overrides
-RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
-
-# Railway uses a dynamic PORT — update Apache to listen on it at startup
-CMD bash -c "sed -i \"s/Listen 80/Listen \${PORT:-80}/\" /etc/apache2/ports.conf && \
-    sed -i \"s/:80>/:\${PORT:-80}>/\" /etc/apache2/sites-enabled/000-default.conf && \
-    apache2-foreground"
+# Startup: substitute PORT, start php-fpm and nginx
+CMD sh -c "sed -i \"s/\${PORT:-80}/${PORT:-80}/g\" /etc/nginx/http.d/default.conf && \
+    php-fpm -D && \
+    nginx -g 'daemon off;'"
