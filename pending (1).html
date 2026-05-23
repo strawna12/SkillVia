@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillVia – Application Received</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(160deg, #dce8f5 0%, #e8f1fa 50%, #f0f6fc 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #1A3A6B;
+  }
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(37,99,192,0.12);
+    padding: 14px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 100;
+  }
+  .logo {
+    display: flex; align-items: center; gap: 9px;
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #1A3A6B, #2563C0);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+  .logo-text { font-size: 1.25rem; font-weight: 800; color: #1A3A6B; }
+  .logo-text span { color: #2563C0; }
+
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 52px 48px;
+    max-width: 580px;
+    width: 100%;
+    box-shadow: 0 4px 24px rgba(26,58,107,0.1), 0 1px 4px rgba(26,58,107,0.06);
+    border: 1px solid rgba(37,99,192,0.08);
+    text-align: center;
+    margin-top: 72px;
+  }
+
+  .status-icon {
+    width: 84px; height: 84px;
+    background: linear-gradient(135deg, #2563C0, #3B9FD4);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.4rem;
+    margin: 0 auto 28px;
+    box-shadow: 0 8px 28px rgba(37,99,192,0.3);
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 8px 28px rgba(37,99,192,0.3); }
+    50% { box-shadow: 0 8px 40px rgba(37,99,192,0.5); }
+  }
+
+  .card h1 {
+    font-size: 2rem; font-weight: 800;
+    color: #1A3A6B;
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+
+  .card p {
+    font-size: 0.95rem;
+    color: #6b87aa;
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #eef4ff;
+    border: 1px solid #c7d9f5;
+    color: #2563C0;
+    border-radius: 100px;
+    padding: 8px 20px;
+    font-size: 0.82rem; font-weight: 700;
+    margin: 20px 0 28px;
+    letter-spacing: 0.3px;
+  }
+  .status-dot {
+    width: 8px; height: 8px;
+    background: #2563C0;
+    border-radius: 50%;
+    animation: blink 1.4s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .steps-list {
+    list-style: none;
+    text-align: left;
+    margin: 24px 0;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .steps-list li {
+    display: flex; align-items: flex-start; gap: 12px;
+    font-size: 0.88rem;
+    color: #5b7fa6;
+    line-height: 1.55;
+  }
+  .step-num {
+    width: 26px; height: 26px; flex-shrink: 0;
+    background: #eef4ff;
+    border: 1.5px solid #c7d9f5;
+    border-radius: 50%;
+    color: #2563C0;
+    font-size: 0.73rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px;
+  }
+  .step-num.done {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #16a34a;
+  }
+
+  .divider {
+    height: 1px; background: #eef3f8;
+    margin: 26px 0;
+  }
+
+  .contact-note {
+    font-size: 0.82rem; color: #a8bdd4;
+  }
+  .contact-note a {
+    color: #2563C0; text-decoration: none; font-weight: 600;
+  }
+  .contact-note a:hover { text-decoration: underline; }
+
+  .btn-home {
+    display: inline-block;
+    margin-top: 26px;
+    background: #f3f7fc;
+    border: 1.5px solid #d0e1f0;
+    color: #3d5a80;
+    padding: 11px 26px;
+    border-radius: 9px;
+    font-size: 0.88rem; font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-home:hover { background: #e8f1fa; border-color: #b8cedf; }
+
+  @media (max-width: 600px) {
+    .card { padding: 36px 24px; }
+    .card h1 { font-size: 1.6rem; }
+    .topbar { padding: 12px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="https://www.skillviaai.com" class="logo">
+    <div class="logo-icon">🛡️</div>
+    <span class="logo-text">Skill<span>Via</span></span>
+  </a>
+</div>
+
+<div class="card">
+  <div class="status-icon">⏳</div>
+  <h1>Application Received!</h1>
+  <p>Thank you for signing up for SkillVia. Your facility's application has been submitted and is currently under review by our team.</p>
+
+  <div class="status-badge">
+    <div class="status-dot"></div>
+    Pending Authorization
+  </div>
+
+  <p>Here's what happens next:</p>
+
+  <ul class="steps-list">
+    <li>
+      <div class="step-num done">✓</div>
+      <div><strong style="color:#1A3A6B;">Application submitted</strong> — Your facility information has been received and logged in our system.</div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div><strong style="color:#1A3A6B;">Review by our team</strong> — We'll review your facility details, typically within 1–2 business days.</div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div><strong style="color:#1A3A6B;">Email confirmation</strong> — You'll receive an email at the address you provided approving or denying your account.</div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div><strong style="color:#1A3A6B;">Access your portal</strong> — Once approved, log in at <strong style="color:#2563C0;">skillviaai.com/supervisor</strong> to get started.</div>
+    </li>
+  </ul>
+
+  <div class="divider"></div>
+
+  <div class="contact-note">
+    Have questions while you wait? Reach out to us at<br>
+    <a href="mailto:aysha@skillviaai.com">aysha@skillviaai.com</a>
+  </div>
+
+  <a href="https://www.skillviaai.com" class="btn-home">← Back to SkillVia Home</a>
+</div>
+
+</body>
+</html>

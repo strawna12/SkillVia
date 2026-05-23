@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillVia – Facility Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(160deg, #dce8f5 0%, #e8f1fa 50%, #f0f6fc 100%);
+  min-height: 100vh;
+  color: #1A3A6B;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(37,99,192,0.12);
+  padding: 14px 40px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+.logo-icon {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, #1A3A6B, #2563C0);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+}
+.logo-text { font-size: 1.25rem; font-weight: 800; color: #1A3A6B; }
+.logo-text span { color: #2563C0; }
+.topbar-note { font-size: 0.8rem; color: #6b87aa; }
+.topbar-note a { color: #2563C0; font-weight: 600; text-decoration: none; }
+.topbar-note a:hover { text-decoration: underline; }
+
+/* ── PAGE LAYOUT ── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  padding: 88px 20px 40px;
+}
+
+.sidebar {
+  width: 280px; flex-shrink: 0;
+  padding: 40px 0 40px 40px;
+  display: flex; flex-direction: column;
+}
+.sidebar-title {
+  font-size: 0.68rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: #a8bdd4;
+  margin-bottom: 20px;
+}
+.step-nav { display: flex; flex-direction: column; gap: 4px; }
+.step-nav-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: default;
+  transition: background 0.2s;
+}
+.step-nav-item.active { background: #eef4ff; }
+.step-nav-circle {
+  width: 28px; height: 28px; flex-shrink: 0;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 800;
+  background: #e2edf5; color: #a8bdd4;
+  border: 2px solid #d0e1f0;
+  transition: all 0.3s;
+}
+.step-nav-item.active .step-nav-circle {
+  background: linear-gradient(135deg, #2563C0, #1A3A6B);
+  color: white; border-color: #2563C0;
+  box-shadow: 0 3px 10px rgba(37,99,192,0.3);
+}
+.step-nav-item.done .step-nav-circle {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white; border-color: #22c55e;
+}
+.step-nav-label {
+  font-size: 0.85rem; font-weight: 600;
+  color: #a8bdd4;
+  transition: color 0.2s;
+}
+.step-nav-item.active .step-nav-label { color: #2563C0; }
+.step-nav-item.done .step-nav-label { color: #6b87aa; }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 32px;
+  border-top: 1px solid #d0e1f0;
+}
+.sidebar-footer p { font-size: 0.75rem; color: #a8bdd4; line-height: 1.6; }
+.sidebar-footer a { color: #2563C0; text-decoration: none; font-weight: 600; }
+
+/* ── MAIN CONTENT ── */
+.main {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 60px 40px 40px;
+}
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 44px 44px;
+  width: 100%;
+  max-width: 620px;
+  box-shadow: 0 4px 24px rgba(26,58,107,0.1), 0 1px 4px rgba(26,58,107,0.06);
+  border: 1px solid rgba(37,99,192,0.08);
+}
+
+/* ── STEP HEADER ── */
+.step-header { margin-bottom: 32px; }
+.step-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: #eef4ff; border: 1px solid #c7d9f5;
+  color: #2563C0; border-radius: 100px;
+  padding: 4px 14px; font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.step-progress {
+  height: 4px; background: #e2edf5;
+  border-radius: 2px; margin-bottom: 6px;
+  overflow: hidden;
+}
+.step-progress-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, #2563C0, #3B9FD4);
+  transition: width 0.4s ease;
+}
+.step-progress-label {
+  font-size: 0.7rem; color: #a8bdd4; font-weight: 600;
+  text-align: right;
+}
+.step-header h2 {
+  font-size: 1.7rem; font-weight: 800; color: #1A3A6B;
+  margin-top: 18px; margin-bottom: 6px;
+}
+.step-header p { font-size: 0.88rem; color: #6b87aa; line-height: 1.6; }
+
+/* ── FORM SECTIONS ── */
+.form-section { margin-bottom: 28px; }
+.form-section-title {
+  font-size: 0.8rem; font-weight: 800; color: #1A3A6B;
+  text-transform: uppercase; letter-spacing: 0.6px;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eef3f8;
+}
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-row.three { grid-template-columns: 2fr 1fr 1fr; }
+.form-group { margin-bottom: 16px; }
+.form-group.full { grid-column: 1 / -1; }
+
+label {
+  display: block;
+  font-size: 0.72rem; font-weight: 700; color: #3d5a80;
+  margin-bottom: 6px; letter-spacing: 0.4px; text-transform: uppercase;
+}
+label .req { color: #ef4444; margin-left: 2px; }
+
+.input-wrap { position: relative; }
+.input-icon {
+  position: absolute; left: 12px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem; pointer-events: none; color: #a8bdd4;
+}
+.input-icon-right {
+  position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer; color: #a8bdd4;
+  font-size: 0.9rem; user-select: none;
+}
+.input-icon-right:hover { color: #5b7fa6; }
+
+input[type="text"], input[type="email"], input[type="password"],
+input[type="tel"], input[type="number"], select, textarea {
+  width: 100%;
+  padding: 11px 14px 11px 38px;
+  background: #f7fafd;
+  border: 1.5px solid #d0e1f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: 'Inter', sans-serif;
+  color: #1A3A6B;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  -webkit-appearance: none;
+}
+input::placeholder, textarea::placeholder { color: #b8cedf; }
+input:focus, select:focus, textarea:focus {
+  border-color: #2563C0;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(37,99,192,0.1);
+}
+select { cursor: pointer; padding-left: 38px; }
+.no-icon input, .no-icon select, .no-icon textarea {
+  padding-left: 14px;
+}
+input.has-right-icon { padding-right: 38px; }
+
+.field-hint { font-size: 0.72rem; color: #a8bdd4; margin-top: 5px; }
+.field-error { font-size: 0.72rem; color: #ef4444; margin-top: 5px; display: none; }
+.field-error.show { display: block; }
+
+/* Staff roster table */
+.staff-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+.staff-table th {
+  font-size: 0.68rem; font-weight: 800;
+  color: #3d5a80; text-transform: uppercase; letter-spacing: 0.5px;
+  text-align: left; padding: 8px 10px;
+  background: #f7fafd;
+  border-bottom: 1.5px solid #e2edf5;
+}
+.staff-table td { padding: 6px 6px; vertical-align: top; }
+.staff-table tr:not(:last-child) td { border-bottom: 1px solid #f0f5fa; }
+.staff-table input, .staff-table select {
+  font-size: 0.82rem; padding: 8px 10px 8px 10px;
+  border-radius: 8px; padding-left: 10px;
+}
+.add-staff-btn {
+  background: none; border: 1.5px dashed #c7d9f5;
+  color: #5b7fa6; border-radius: 10px;
+  padding: 10px; width: 100%;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.84rem; font-weight: 600;
+  cursor: pointer; margin-top: 10px;
+  transition: all 0.2s;
+}
+.add-staff-btn:hover { background: #eef4ff; border-color: #2563C0; color: #2563C0; }
+.remove-row-btn {
+  background: none; border: none;
+  color: #d0e1f0; font-size: 1rem;
+  cursor: pointer; padding: 4px 6px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+  line-height: 1;
+}
+.remove-row-btn:hover { color: #ef4444; background: #fff5f5; }
+
+/* Checkbox */
+.checkbox-group { display: flex; align-items: flex-start; gap: 10px; }
+.checkbox-group input[type="checkbox"] {
+  width: 18px; height: 18px; flex-shrink: 0;
+  accent-color: #2563C0;
+  margin-top: 2px;
+  padding: 0; border-radius: 4px;
+}
+.checkbox-label { font-size: 0.84rem; color: #5b7fa6; line-height: 1.5; }
+.checkbox-label a { color: #2563C0; text-decoration: none; font-weight: 600; }
+
+/* Error banner */
+.error-banner {
+  background: #fff5f5; border: 1px solid #fecaca;
+  color: #dc2626; border-radius: 10px;
+  padding: 12px 16px; font-size: 0.84rem;
+  margin-bottom: 20px; display: none;
+}
+
+/* ── ACTIONS ── */
+.step-actions {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #eef3f8;
+  gap: 12px;
+}
+.btn-back {
+  background: none; border: 1.5px solid #d0e1f0;
+  color: #6b87aa; padding: 12px 22px;
+  border-radius: 10px; font-weight: 600; font-size: 0.9rem;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+  transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-back:hover { border-color: #b8cedf; color: #3d5a80; background: #f7fafd; }
+.btn-back:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-next {
+  background: linear-gradient(135deg, #2563C0, #1A3A6B);
+  color: white; border: none;
+  padding: 13px 32px;
+  border-radius: 10px; font-weight: 700; font-size: 0.95rem;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(37,99,192,0.35);
+  display: flex; align-items: center; gap: 8px;
+  margin-left: auto;
+}
+.btn-next:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(37,99,192,0.45); }
+.btn-next.loading { opacity: 0.7; cursor: not-allowed; transform: none !important; }
+
+.btn-submit {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: white; border: none;
+  padding: 13px 36px;
+  border-radius: 10px; font-weight: 700; font-size: 0.95rem;
+  font-family: 'Inter', sans-serif; cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(34,197,94,0.35);
+  display: flex; align-items: center; gap: 8px;
+  margin-left: auto;
+}
+.btn-submit:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(34,197,94,0.45); }
+
+.spinner {
+  display: inline-block; width: 15px; height: 15px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── MOBILE ── */
+@media (max-width: 860px) {
+  .sidebar { display: none; }
+  .main { padding: 24px; }
+  .card { padding: 32px 24px; }
+  .form-row { grid-template-columns: 1fr; }
+  .form-row.three { grid-template-columns: 1fr; }
+  .topbar { padding: 12px 20px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <a href="https://www.skillviaai.com" class="logo">
+    <div class="logo-icon">🛡️</div>
+    <span class="logo-text">Skill<span>Via</span></span>
+  </a>
+  <div class="topbar-note">Already have an account? <a href="supervisor.html">Sign in →</a></div>
+</div>
+
+<div class="page">
+  <!-- SIDEBAR NAV -->
+  <div class="sidebar">
+    <div class="sidebar-title">Facility Onboarding</div>
+    <div class="step-nav" id="step-nav">
+      <div class="step-nav-item active" data-step="1">
+        <div class="step-nav-circle" id="nav-circle-1">1</div>
+        <span class="step-nav-label">Facility Info</span>
+      </div>
+      <div class="step-nav-item" data-step="2">
+        <div class="step-nav-circle" id="nav-circle-2">2</div>
+        <span class="step-nav-label">Licensing</span>
+      </div>
+      <div class="step-nav-item" data-step="3">
+        <div class="step-nav-circle" id="nav-circle-3">3</div>
+        <span class="step-nav-label">Leadership</span>
+      </div>
+      <div class="step-nav-item" data-step="4">
+        <div class="step-nav-circle" id="nav-circle-4">4</div>
+        <span class="step-nav-label">Billing</span>
+      </div>
+      <div class="step-nav-item" data-step="5">
+        <div class="step-nav-circle" id="nav-circle-5">5</div>
+        <span class="step-nav-label">Staff Roster</span>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      <p>Questions? Email us at<br><a href="/cdn-cgi/l/email-protection#a5c4dcd6cdc4e5d6ceccc9c9d3ccc4c4cc8bc6cac8"><span class="__cf_email__" data-cfemail="1d7c646e757c5d6e767471716b747c7c74337e7270">[email&#160;protected]</span></a></p>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="card">
+
+      <!-- STEP 1: FACILITY INFO -->
+      <div id="step-1" class="step-panel">
+        <div class="step-header">
+          <div class="step-badge">Step 1 of 5</div>
+          <div class="step-progress"><div class="step-progress-fill" style="width:20%"></div></div>
+          <div class="step-progress-label">20% complete</div>
+          <h2>🏥 Facility Information</h2>
+          <p>Tell us about your facility. This information will appear on reports and documentation.</p>
+        </div>
+
+        <div class="error-banner" id="err-1"></div>
+
+        <div class="form-section">
+          <div class="form-section-title">🏥 Facility Details</div>
+          <div class="form-group">
+            <label>Facility Name <span class="req">*</span></label>
+            <div class="input-wrap">
+              <span class="input-icon">🏥</span>
+              <input type="text" id="facilityName" placeholder="e.g. Sunrise Gardens SNF" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Street Address <span class="req">*</span></label>
+            <div class="input-wrap">
+              <span class="input-icon">📍</span>
+              <input type="text" id="address" placeholder="123 Main Street" />
+            </div>
+          </div>
+          <div class="form-row three">
+            <div class="form-group">
+              <label>City <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">🏙️</span>
+                <input type="text" id="city" placeholder="City" />
+              </div>
+            </div>
+            <div class="form-group no-icon">
+              <label>State</label>
+              <div class="input-wrap">
+                <span class="input-icon">🗺️</span>
+                <select id="state">
+                  <option value="">--</option>
+                  <option>AL</option><option>AK</option><option>AZ</option><option>AR</option>
+                  <option>CA</option><option>CO</option><option>CT</option><option>DE</option>
+                  <option>FL</option><option>GA</option><option>HI</option><option>ID</option>
+                  <option>IL</option><option>IN</option><option>IA</option><option>KS</option>
+                  <option>KY</option><option>LA</option><option>ME</option><option>MD</option>
+                  <option>MA</option><option>MI</option><option>MN</option><option>MS</option>
+                  <option>MO</option><option>MT</option><option>NE</option><option>NV</option>
+                  <option>NH</option><option>NJ</option><option>NM</option><option>NY</option>
+                  <option>NC</option><option>ND</option><option>OH</option><option>OK</option>
+                  <option>OR</option><option>PA</option><option>RI</option><option>SC</option>
+                  <option>SD</option><option>TN</option><option>TX</option><option>UT</option>
+                  <option>VT</option><option>VA</option><option>WA</option><option>WV</option>
+                  <option>WI</option><option>WY</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>ZIP <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">📮</span>
+                <input type="text" id="zip" placeholder="00000" maxlength="10" />
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Facility Phone</label>
+              <div class="input-wrap">
+                <span class="input-icon">📞</span>
+                <input type="tel" id="facilityPhone" placeholder="(555) 000-0000" oninput="formatPhone(this)" maxlength="14" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Bed Count</label>
+              <div class="input-wrap">
+                <span class="input-icon">🛏️</span>
+                <input type="number" id="bedCount" placeholder="e.g. 120" min="1" max="999" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-title">🔐 Account Login</div>
+          <p style="font-size:0.84rem;color:#6b87aa;margin-bottom:16px;">Create the email and password you'll use to sign into SkillVia.</p>
+          <div class="form-group">
+            <label>Login Email <span class="req">*</span></label>
+            <div class="input-wrap">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="loginEmail" placeholder="admin@yourfacility.com" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Password <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="password" placeholder="Min. 8 characters" class="has-right-icon" />
+                <span class="input-icon-right" onclick="togglePw('password', this)">👁</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Confirm Password <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="confirmPassword" placeholder="Re-enter password" class="has-right-icon" />
+                <span class="input-icon-right" onclick="togglePw('confirmPassword', this)">👁</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <span style="font-size:0.8rem;color:#a8bdd4;">No payment info needed</span>
+          <button class="btn-next" onclick="goToStep(2)">Continue → <span>Licensing</span></button>
+        </div>
+      </div>
+
+      <!-- STEP 2: LICENSING -->
+      <div id="step-2" class="step-panel" style="display:none">
+        <div class="step-header">
+          <div class="step-badge">Step 2 of 5</div>
+          <div class="step-progress"><div class="step-progress-fill" style="width:40%"></div></div>
+          <div class="step-progress-label">40% complete</div>
+          <h2>📋 Licensing</h2>
+          <p>Provide your facility's licensing information to verify compliance eligibility.</p>
+        </div>
+        <div class="error-banner" id="err-2"></div>
+        <div class="form-section">
+          <div class="form-section-title">📋 License Details</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Facility License # <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">🪪</span>
+                <input type="text" id="licenseNumber" placeholder="e.g. SNF-123456" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>License Expiration <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">📅</span>
+                <input type="text" id="licenseExpiry" placeholder="MM/DD/YYYY" maxlength="10" oninput="formatDate(this)" />
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>CMS Certification # <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">🏛️</span>
+                <input type="text" id="cmsNumber" placeholder="e.g. 12-3456" />
+              </div>
+            </div>
+            <div class="form-group no-icon">
+              <label>Facility Type</label>
+              <div class="input-wrap">
+                <span class="input-icon">🏥</span>
+                <select id="facilityType">
+                  <option value="">Select type</option>
+                  <option>Skilled Nursing Facility (SNF)</option>
+                  <option>Post-Acute Care</option>
+                  <option>Long-Term Care</option>
+                  <option>Rehabilitation Center</option>
+                  <option>Memory Care Unit</option>
+                  <option>Assisted Living Facility</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Accrediting Organization</label>
+            <div class="input-wrap">
+              <span class="input-icon">🏆</span>
+              <input type="text" id="accreditor" placeholder="e.g. The Joint Commission, DNV, CARF" />
+            </div>
+            <p class="field-hint">Optional — enter if your facility is accredited.</p>
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="btn-back" onclick="goToStep(1)">← Back</button>
+          <button class="btn-next" onclick="goToStep(3)">Continue → <span>Leadership</span></button>
+        </div>
+      </div>
+
+      <!-- STEP 3: LEADERSHIP -->
+      <div id="step-3" class="step-panel" style="display:none">
+        <div class="step-header">
+          <div class="step-badge">Step 3 of 5</div>
+          <div class="step-progress"><div class="step-progress-fill" style="width:60%"></div></div>
+          <div class="step-progress-label">60% complete</div>
+          <h2>👥 Leadership Team</h2>
+          <p>Tell us about your facility's key leaders. These contacts will be notified of compliance alerts.</p>
+        </div>
+        <div class="error-banner" id="err-3"></div>
+        <div class="form-section">
+          <div class="form-section-title">🧑‍💼 Administrator</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="adminFirst" placeholder="First name" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Last Name <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="adminLast" placeholder="Last name" />
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="adminEmail" placeholder="admin@facility.com" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <div class="input-wrap">
+                <span class="input-icon">📞</span>
+                <input type="tel" id="adminPhone" placeholder="(555) 000-0000" oninput="formatPhone(this)" maxlength="14" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">🩺 Director of Nursing (DON)</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="donFirst" placeholder="First name" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Last Name <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="donLast" placeholder="Last name" />
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="donEmail" placeholder="don@facility.com" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <div class="input-wrap">
+                <span class="input-icon">📞</span>
+                <input type="tel" id="donPhone" placeholder="(555) 000-0000" oninput="formatPhone(this)" maxlength="14" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="step-actions">
+          <button class="btn-back" onclick="goToStep(2)">← Back</button>
+          <button class="btn-next" onclick="goToStep(4)">Continue → <span>Billing</span></button>
+        </div>
+      </div>
+
+      <!-- STEP 4: BILLING -->
+      <div id="step-4" class="step-panel" style="display:none">
+        <div class="step-header">
+          <div class="step-badge">Step 4 of 5</div>
+          <div class="step-progress"><div class="step-progress-fill" style="width:80%"></div></div>
+          <div class="step-progress-label">80% complete</div>
+          <h2>💳 Billing</h2>
+          <p>Your 14-day free trial requires no payment today. Billing begins only after your trial ends — cancel anytime.</p>
+        </div>
+
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:flex-start;gap:12px;">
+          <span style="font-size:1.3rem;margin-top:1px;">✅</span>
+          <div>
+            <div style="font-size:0.88rem;font-weight:700;color:#16a34a;margin-bottom:4px;">No payment required today</div>
+            <div style="font-size:0.82rem;color:#4b7a56;line-height:1.5;">Your free trial gives you full access for 14 days. We'll only ask for billing info at the end of your trial — and you can cancel at any time with no charges.</div>
+          </div>
+        </div>
+
+        <div class="error-banner" id="err-4"></div>
+        <div class="form-section">
+          <div class="form-section-title">🧾 Billing Contact</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="billingFirst" placeholder="First name" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Last Name <span class="req">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="billingLast" placeholder="Last name" />
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Billing Email <span class="req">*</span></label>
+            <div class="input-wrap">
+              <span class="input-icon">✉️</span>
+              <input type="email" id="billingEmail" placeholder="billing@yourfacility.com" />
+            </div>
+            <p class="field-hint">Invoices and billing notices will be sent here.</p>
+          </div>
+          <div class="form-group">
+            <label>Billing Address</label>
+            <div class="input-wrap">
+              <span class="input-icon">📍</span>
+              <input type="text" id="billingAddress" placeholder="Same as facility address? Leave blank." />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:8px;">
+          <div class="checkbox-group">
+            <input type="checkbox" id="termsAgree" />
+            <label class="checkbox-label" for="termsAgree" style="text-transform:none;letter-spacing:0;font-weight:400;">
+              I agree to SkillVia's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I understand that my free trial lasts 14 days and billing begins only after I provide payment information at the end of the trial.
+            </label>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn-back" onclick="goToStep(3)">← Back</button>
+          <button class="btn-next" onclick="goToStep(5)">Continue → <span>Staff Roster</span></button>
+        </div>
+      </div>
+
+      <!-- STEP 5: STAFF ROSTER -->
+      <div id="step-5" class="step-panel" style="display:none">
+        <div class="step-header">
+          <div class="step-badge">Step 5 of 5</div>
+          <div class="step-progress"><div class="step-progress-fill" style="width:95%"></div></div>
+          <div class="step-progress-label">Almost done!</div>
+          <h2>👩‍⚕️ Staff Roster</h2>
+          <p>Add your staff now, or skip and add them later from your supervisor dashboard. At least one staff member is recommended.</p>
+        </div>
+        <div class="error-banner" id="err-5"></div>
+
+        <div class="form-section">
+          <div class="form-section-title">👩‍⚕️ Staff Members</div>
+          <div style="overflow-x:auto;">
+            <table class="staff-table" id="staff-table">
+              <thead>
+                <tr>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Phone</th>
+                  <th>Role / Dept</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="staff-tbody">
+                <tr>
+                  <td><input type="text" placeholder="First" /></td>
+                  <td><input type="text" placeholder="Last" /></td>
+                  <td><input type="tel" placeholder="(555) 000-0000" oninput="formatPhone(this)" maxlength="14" /></td>
+                  <td>
+                    <select style="padding-left:10px;">
+                      <option value="">Select role</option>
+                      <option>CNA</option>
+                      <option>LPN</option>
+                      <option>RN</option>
+                      <option>MDS Coordinator</option>
+                      <option>Social Worker</option>
+                      <option>Activities</option>
+                      <option>Dietary</option>
+                      <option>Housekeeping</option>
+                      <option>Other</option>
+                    </select>
+                  </td>
+                  <td><button class="remove-row-btn" onclick="removeRow(this)">✕</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <button class="add-staff-btn" onclick="addStaffRow()">+ Add Another Staff Member</button>
+          <p class="field-hint" style="margin-top:10px;">You can import a full roster via CSV from your supervisor dashboard after setup.</p>
+        </div>
+
+        <div class="step-actions">
+          <button class="btn-back" onclick="goToStep(4)">← Back</button>
+          <button class="btn-submit" id="submit-btn" onclick="handleSubmit()">
+            ✓ Submit Application
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /card -->
+  </div><!-- /main -->
+</div><!-- /page -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+let currentStep = 1;
+
+function goToStep(n) {
+  // Hide current
+  document.getElementById('step-' + currentStep).style.display = 'none';
+  // Update sidebar
+  const prevItem = document.querySelector(`.step-nav-item[data-step="${currentStep}"]`);
+  if (n > currentStep) {
+    prevItem.classList.remove('active');
+    prevItem.classList.add('done');
+    document.getElementById('nav-circle-' + currentStep).textContent = '✓';
+  } else {
+    // going back
+    const nextItem = document.querySelector(`.step-nav-item[data-step="${n + 1}"]`);
+    if (nextItem) { nextItem.classList.remove('done'); nextItem.classList.remove('active'); document.getElementById('nav-circle-' + (n+1)).textContent = n+1; }
+    prevItem.classList.remove('active');
+  }
+  currentStep = n;
+  document.getElementById('step-' + n).style.display = 'block';
+  const newItem = document.querySelector(`.step-nav-item[data-step="${n}"]`);
+  newItem.classList.remove('done');
+  newItem.classList.add('active');
+  document.getElementById('nav-circle-' + n).textContent = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function togglePw(id, el) {
+  const input = document.getElementById(id);
+  if (input.type === 'password') { input.type = 'text'; el.textContent = '🙈'; }
+  else { input.type = 'password'; el.textContent = '👁'; }
+}
+
+function formatPhone(input) {
+  let val = input.value.replace(/\D/g, '');
+  if (val.length >= 6) val = '(' + val.slice(0,3) + ') ' + val.slice(3,6) + '-' + val.slice(6,10);
+  else if (val.length >= 3) val = '(' + val.slice(0,3) + ') ' + val.slice(3);
+  input.value = val;
+}
+
+function formatDate(input) {
+  let val = input.value.replace(/\D/g, '');
+  if (val.length >= 4) val = val.slice(0,2) + '/' + val.slice(2,4) + '/' + val.slice(4,8);
+  else if (val.length >= 2) val = val.slice(0,2) + '/' + val.slice(2);
+  input.value = val;
+}
+
+function addStaffRow() {
+  const tbody = document.getElementById('staff-tbody');
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td><input type="text" placeholder="First" /></td>
+    <td><input type="text" placeholder="Last" /></td>
+    <td><input type="tel" placeholder="(555) 000-0000" oninput="formatPhone(this)" maxlength="14" /></td>
+    <td>
+      <select style="padding-left:10px;">
+        <option value="">Select role</option>
+        <option>CNA</option><option>LPN</option><option>RN</option>
+        <option>MDS Coordinator</option><option>Social Worker</option>
+        <option>Activities</option><option>Dietary</option>
+        <option>Housekeeping</option><option>Other</option>
+      </select>
+    </td>
+    <td><button class="remove-row-btn" onclick="removeRow(this)">✕</button></td>
+  `;
+  tbody.appendChild(row);
+}
+
+function removeRow(btn) {
+  const row = btn.closest('tr');
+  const tbody = document.getElementById('staff-tbody');
+  if (tbody.rows.length > 1) row.remove();
+}
+
+async function handleSubmit() {
+  const btn = document.getElementById('submit-btn');
+  btn.innerHTML = '<span class="spinner"></span> Submitting...';
+  btn.disabled = true;
+
+  /**
+   * BACKEND INTEGRATION REQUIRED
+   * POST /api/facility/signup
+   * Collect all form data and submit to backend.
+   * On success → redirect to /pending.html
+   */
+
+  // Collect staff roster
+  const staffRows = Array.from(document.querySelectorAll('#staff-tbody tr')).map(row => {
+    const inputs = row.querySelectorAll('input, select');
+    return {
+      firstName: inputs[0]?.value?.trim(),
+      lastName: inputs[1]?.value?.trim(),
+      phone: inputs[2]?.value?.trim(),
+      role: inputs[3]?.value?.trim()
+    };
+  }).filter(s => s.firstName || s.lastName);
+
+  const payload = {
+    facility: {
+      name: document.getElementById('facilityName').value,
+      address: document.getElementById('address').value,
+      city: document.getElementById('city').value,
+      state: document.getElementById('state').value,
+      zip: document.getElementById('zip').value,
+      phone: document.getElementById('facilityPhone').value,
+      bedCount: document.getElementById('bedCount').value,
+    },
+    account: {
+      email: document.getElementById('loginEmail').value,
+      password: document.getElementById('password').value,
+    },
+    licensing: {
+      licenseNumber: document.getElementById('licenseNumber').value,
+      licenseExpiry: document.getElementById('licenseExpiry').value,
+      cmsNumber: document.getElementById('cmsNumber').value,
+      facilityType: document.getElementById('facilityType').value,
+      accreditor: document.getElementById('accreditor').value,
+    },
+    leadership: {
+      administrator: {
+        firstName: document.getElementById('adminFirst').value,
+        lastName: document.getElementById('adminLast').value,
+        email: document.getElementById('adminEmail').value,
+        phone: document.getElementById('adminPhone').value,
+      },
+      don: {
+        firstName: document.getElementById('donFirst').value,
+        lastName: document.getElementById('donLast').value,
+        email: document.getElementById('donEmail').value,
+        phone: document.getElementById('donPhone').value,
+      }
+    },
+    billing: {
+      firstName: document.getElementById('billingFirst').value,
+      lastName: document.getElementById('billingLast').value,
+      email: document.getElementById('billingEmail').value,
+      address: document.getElementById('billingAddress').value,
+    },
+    staff: staffRows
+  };
+
+  try {
+    const res = await fetch('/api/facility/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (data.success) {
+      window.location.href = '/pending.html';
+    } else {
+      showError('5', data.message || 'Submission failed. Please try again.');
+      btn.innerHTML = '✓ Submit Application';
+      btn.disabled = false;
+    }
+  } catch (err) {
+    showError('5', 'Connection error. Please check your connection and try again.');
+    btn.inner

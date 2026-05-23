@@ -1,0 +1,11 @@
+RewriteEngine On
+
+# Route /api/* requests to api.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^api/(.*)$ api.php [QSA,L]
+
+# Security: block direct access to sensitive files
+<FilesMatch "\.(env|sh|md|git)$">
+    Require all denied
+</FilesMatch>

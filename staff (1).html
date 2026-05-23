@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillVia – Staff Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(160deg, #dce8f5 0%, #e8f1fa 50%, #f0f6fc 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #1A3A6B;
+  }
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(37,99,192,0.12);
+    padding: 14px 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 9px; text-decoration: none; }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #1A3A6B, #2563C0);
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+  }
+  .logo-text { font-size: 1.25rem; font-weight: 800; color: #1A3A6B; }
+  .logo-text span { color: #2563C0; }
+  .topbar-link {
+    font-size: 0.82rem; font-weight: 600;
+    color: #5b7fa6; text-decoration: none; transition: color 0.2s;
+  }
+  .topbar-link:hover { color: #2563C0; }
+
+  /* CARD */
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 44px 40px;
+    max-width: 480px; width: 100%;
+    box-shadow: 0 4px 24px rgba(26,58,107,0.1), 0 1px 4px rgba(26,58,107,0.06);
+    border: 1px solid rgba(37,99,192,0.08);
+    margin-top: 72px;
+  }
+
+  /* STEPS INDICATOR */
+  .steps-indicator {
+    display: flex; align-items: center; margin-bottom: 8px;
+  }
+  .step-dot {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 800; flex-shrink: 0;
+    border: 2px solid #d0e1f0;
+    color: #a8bdd4;
+    background: #f7fafd;
+    transition: all 0.3s;
+  }
+  .step-dot.active {
+    background: linear-gradient(135deg, #2563C0, #1A3A6B);
+    border-color: #2563C0;
+    color: white;
+    box-shadow: 0 3px 10px rgba(37,99,192,0.35);
+  }
+  .step-dot.done {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-color: #22c55e;
+    color: white;
+  }
+  .step-line {
+    flex: 1; height: 2px;
+    background: #e2edf5; margin: 0 7px;
+    transition: background 0.3s;
+  }
+  .step-line.done { background: #22c55e; }
+  .step-labels {
+    display: flex; justify-content: space-between;
+    margin-bottom: 30px;
+  }
+  .step-label-item {
+    font-size: 0.68rem; font-weight: 700;
+    color: #b8cedf; text-align: center; flex: 1;
+    text-transform: uppercase; letter-spacing: 0.4px;
+    transition: color 0.3s;
+  }
+  .step-label-item.active { color: #2563C0; }
+
+  /* PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .card-badge {
+    display: inline-block;
+    background: #eef4ff; border: 1px solid #c7d9f5;
+    color: #2563C0; border-radius: 100px;
+    padding: 4px 14px; font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.6px; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .panel h2 {
+    font-size: 1.7rem; font-weight: 800;
+    color: #1A3A6B; margin-bottom: 8px;
+  }
+  .panel-sub {
+    font-size: 0.87rem; color: #6b87aa;
+    margin-bottom: 26px; line-height: 1.6;
+  }
+
+  /* FORM */
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block; font-size: 0.73rem; font-weight: 700;
+    color: #3d5a80; margin-bottom: 7px;
+    letter-spacing: 0.4px; text-transform: uppercase;
+  }
+  .input-wrap { position: relative; }
+  .input-icon {
+    position: absolute; left: 13px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.95rem; pointer-events: none;
+  }
+  .form-group input {
+    width: 100%;
+    padding: 12px 14px 12px 40px;
+    background: #f7fafd;
+    border: 1.5px solid #d0e1f0;
+    border-radius: 10px;
+    font-size: 0.92rem;
+    font-family: 'Inter', sans-serif;
+    color: #1A3A6B;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-group input::placeholder { color: #a8bdd4; }
+  .form-group input:focus {
+    border-color: #2563C0;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(37,99,192,0.1);
+  }
+  .field-hint { font-size: 0.74rem; color: #a8bdd4; margin-top: 5px; line-height: 1.4; }
+
+  /* PIN strength */
+  .pin-strength { margin-top: 7px; }
+  .pin-bars { display: flex; gap: 4px; margin-bottom: 4px; }
+  .pin-bar { height: 3px; flex: 1; border-radius: 2px; background: #e2edf5; transition: background 0.3s; }
+  .pin-bar.weak { background: #ef4444; }
+  .pin-bar.medium { background: #f59e0b; }
+  .pin-bar.strong { background: #22c55e; }
+  .pin-strength-label { font-size: 0.7rem; color: #a8bdd4; }
+
+  /* Phone display */
+  .phone-display {
+    background: #f3f7fc; border: 1px solid #d0e1f0;
+    border-radius: 9px; padding: 11px 14px; margin-bottom: 18px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .phone-display span { font-size: 0.88rem; font-weight: 600; color: #1A3A6B; }
+  .phone-display button {
+    background: none; border: none; color: #2563C0;
+    font-size: 0.76rem; font-weight: 600;
+    font-family: 'Inter', sans-serif; cursor: pointer; transition: color 0.2s;
+  }
+  .phone-display button:hover { color: #1A3A6B; }
+
+  /* Found badge */
+  .found-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #f0fdf4; border: 1px solid #bbf7d0;
+    color: #16a34a; border-radius: 8px;
+    padding: 6px 12px; font-size: 0.77rem; font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, #2563C0, #1A3A6B);
+    color: white; border: none; padding: 14px;
+    border-radius: 10px; font-weight: 700; font-size: 0.95rem;
+    font-family: 'Inter', sans-serif; cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 6px;
+    box-shadow: 0 4px 14px rgba(37,99,192,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(37,99,192,0.45); }
+  .btn-back {
+    background: none; border: none; color: #a8bdd4;
+    font-size: 0.8rem; font-family: 'Inter', sans-serif;
+    cursor: pointer; padding: 0; margin-top: 14px;
+    display: flex; align-items: center; gap: 4px;
+    font-weight: 600; transition: color 0.2s;
+  }
+  .btn-back:hover { color: #5b7fa6; }
+
+  /* Error */
+  .error-msg {
+    background: #fff5f5; border: 1px solid #fecaca;
+    color: #dc2626; border-radius: 9px;
+    padding: 11px 14px; font-size: 0.83rem;
+    margin-bottom: 16px; display: none;
+  }
+
+  /* Spinner */
+  .spinner {
+    display: inline-block; width: 15px; height: 15px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white; border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle; margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Help box */
+  .help-box {
+    background: #f3f7fc; border: 1px solid #d0e1f0;
+    border-radius: 10px; padding: 14px 16px;
+    margin-top: 18px;
+  }
+  .help-box p { font-size: 0.8rem; color: #6b87aa; line-height: 1.5; }
+  .help-box a { color: #2563C0; text-decoration: none; font-weight: 600; }
+  .help-box a:hover { text-decoration: underline; }
+
+  /* Success */
+  .success-state { display: none; text-align: center; padding: 16px 0; }
+  .success-icon {
+    width: 76px; height: 76px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem; margin: 0 auto 22px;
+    box-shadow: 0 8px 24px rgba(34,197,94,0.3);
+  }
+  .success-state h3 {
+    font-size: 1.4rem; font-weight: 800;
+    color: #1A3A6B; margin-bottom: 8px;
+  }
+  .success-state p { font-size: 0.88rem; color: #6b87aa; }
+
+  /* Footer link */
+  .supervisor-link {
+    text-align: center; margin-top: 26px;
+    padding-top: 18px; border-top: 1px solid #eef3f8;
+    font-size: 0.78rem; color: #b8cedf;
+  }
+  .supervisor-link a {
+    color: #5b7fa6; text-decoration: none;
+    font-weight: 600; transition: color 0.2s;
+  }
+  .supervisor-link a:hover { color: #2563C0; }
+
+  @media (max-width: 500px) {
+    .card { padding: 30px 20px; margin-top: 64px; }
+    .panel h2 { font-size: 1.4rem; }
+    .topbar { padding: 12px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="https://www.skillviaai.com" class="logo">
+    <div class="logo-icon">🛡️</div>
+    <span class="logo-text">Skill<span>Via</span></span>
+  </a>
+  <a href="supervisor.html" class="topbar-link">Supervisor Login →</a>
+</div>
+
+<div class="card">
+  <!-- Step indicator -->
+  <div class="steps-indicator">
+    <div class="step-dot active" id="dot-1">1</div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step-dot" id="dot-2">2</div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step-dot" id="dot-3">3</div>
+  </div>
+  <div class="step-labels">
+    <div class="step-label-item active" id="lbl-1">Phone</div>
+    <div class="step-label-item" id="lbl-2">PIN</div>
+    <div class="step-label-item" id="lbl-3">Access</div>
+  </div>
+
+  <!-- PANEL 1: Phone -->
+  <div class="panel active" id="panel-1">
+    <div class="card-badge">Staff Portal</div>
+    <h2>Welcome!</h2>
+    <p class="panel-sub">Enter your mobile number to get started. First-time users will create a PIN next.</p>
+    <div class="error-msg" id="error-1"></div>
+    <div class="form-group">
+      <label>Mobile Phone Number</label>
+      <div class="input-wrap">
+        <span class="input-icon">📱</span>
+        <input type="tel" id="phone" placeholder="(555) 000-0000" maxlength="14"
+          oninput="formatPhone(this)"
+          onkeydown="if(event.key==='Enter') handlePhoneNext()" />
+      </div>
+      <p class="field-hint">Use the number your facility registered you with.</p>
+    </div>
+    <button class="btn-primary" id="phone-btn" onclick="handlePhoneNext()">Continue →</button>
+    <div class="help-box">
+      <p>Not set up yet? Contact your supervisor to be added to SkillVia, or email <a href="/cdn-cgi/l/email-protection#98f9e1ebf0f9d8ebf3f1f4f4eef1f9f9f1b6fbf7f5"><span class="__cf_email__" data-cfemail="90f1e9e3f8f1d0e3fbf9fcfce6f9f1f1f9bef3fffd">[email&#160;protected]</span></a> for help.</p>
+    </div>
+  </div>
+
+  <!-- PANEL 2A: Returning -->
+  <div class="panel" id="panel-2-returning">
+    <div class="found-badge">✓ Account found</div>
+    <h2>Welcome Back!</h2>
+    <p class="panel-sub">Enter your PIN to access your staff portal.</p>
+    <div class="error-msg" id="error-returning"></div>
+    <div class="phone-display">
+      <span id="phone-display-ret">📱</span>
+      <button onclick="goBack()">← Change</button>
+    </div>
+    <div class="form-group">
+      <label>Your PIN</label>
+      <div class="input-wrap">
+        <span class="input-icon">🔒</span>
+        <input type="password" id="pin-returning" placeholder="Enter your PIN" maxlength="6"
+          onkeydown="if(event.key==='Enter') handleReturningLogin()" />
+      </div>
+      <p class="field-hint">Forgot your PIN? Contact your supervisor to reset it.</p>
+    </div>
+    <button class="btn-primary" id="returning-btn" onclick="handleReturningLogin()">Log In →</button>
+    <button class="btn-back" onclick="goBack()">← Back</button>
+  </div>
+
+  <!-- PANEL 2B: New user -->
+  <div class="panel" id="panel-2-new">
+    <div class="card-badge">First Time Setup</div>
+    <h2>Create Your PIN</h2>
+    <p class="panel-sub">You're all set up! Choose a 4–6 digit PIN you'll use to log in going forward.</p>
+    <div class="error-msg" id="error-new"></div>
+    <div class="phone-display">
+      <span id="phone-display-new">📱</span>
+      <button onclick="goBack()">← Change</button>
+    </div>
+    <div class="form-group">
+      <label>Create PIN (4–6 digits)</label>
+      <div class="input-wrap">
+        <span class="input-icon">🔒</span>
+        <input type="password" id="pin-new" placeholder="Create your PIN" maxlength="6"
+          oninput="checkPinStrength(this.value)" />
+      </div>
+      <div class="pin-strength">
+        <div class="pin-bars">
+          <div class="pin-bar" id="bar-1"></div>
+          <div class="pin-bar" id="bar-2"></div>
+          <div class="pin-bar" id="bar-3"></div>
+        </div>
+        <div class="pin-strength-label" id="strength-label">Enter at least 4 digits</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Confirm PIN</label>
+      <div class="input-wrap">
+        <span class="input-icon">🔒</span>
+        <input type="password" id="pin-confirm" placeholder="Re-enter your PIN" maxlength="6"
+          onkeydown="if(event.key==='Enter') handleCreatePin()" />
+      </div>
+    </div>
+    <button class="btn-primary" id="create-btn" onclick="handleCreatePin()">Create PIN & Log In →</button>
+    <button class="btn-back" onclick="goBack()">← Back</button>
+  </div>
+
+  <!-- SUCCESS -->
+  <div class="success-state" id="success-state">
+    <div class="success-icon">✓</div>
+    <h3 id="success-title">Logging you in...</h3>
+    <p id="success-msg">Redirecting to your staff dashboard. Please wait.</p>
+  </div>
+
+  <div class="supervisor-link">
+    Are you a supervisor? <a href="supervisor.html">Supervisor Login →</a>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  /**
+   * BACKEND INTEGRATION REQUIRED
+   * 1. POST /api/staff/check-phone  → { exists, hasPin }
+   * 2. POST /api/staff/login        → { success, token }
+   * 3. POST /api/staff/create-pin   → { success, token }
+   */
+
+  let currentPhone = '';
+
+  function formatPhone(input) {
+    let val = input.value.replace(/\D/g, '');
+    if (val.length >= 6) val = '(' + val.slice(0,3) + ') ' + val.slice(3,6) + '-' + val.slice(6,10);
+    else if (val.length >= 3) val = '(' + val.slice(0,3) + ') ' + val.slice(3);
+    input.value = val;
+  }
+
+  function showPanel(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    if (id !== '__none__') document.getElementById(id).classList.add('active');
+  }
+
+  function updateSteps(step) {
+    [1,2,3].forEach(i => {
+      const dot = document.getElementById('dot-' + i);
+      const lbl = document.getElementById('lbl-' + i);
+      dot.classList.remove('active','done');
+      lbl.classList.remove('active');
+      if (i < step) { dot.classList.add('done'); dot.textContent = '✓'; }
+      else if (i === step) { dot.classList.add('active'); dot.textContent = i; lbl.classList.add('active'); }
+      else { dot.textContent = i; }
+    });
+    [1,2].forEach(i => {
+      document.getElementById('line-' + i).classList.toggle('done', i < step);
+    });
+  }
+
+  function showError(panelId, msg) {
+    const el = document.getElementById('error-' + panelId);
+    el.textContent = '⚠️ ' + msg; el.style.display = 'block';
+  }
+  function clearError(panelId) {
+    const el = document.getElementById('error-' + panelId);
+    if (el) el.style.display = 'none';
+  }
+
+  async function handlePhoneNext() {
+    const phone = document.getElementById('phone').value.trim();
+    const btn = document.getElementById('phone-btn');
+    clearError('1');
+
+    if (!phone || phone.replace(/\D/g,'').length < 10) {
+      showError('1', 'Please enter a valid 10-digit phone number.');
+      return;
+    }
+
+    currentPhone = phone;
+    btn.innerHTML = '<span class="spinner"></span> Checking...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/staff/check-phone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phone.replace(/\D/g,'') })
+      });
+      const data = await res.json();
+
+      if (!data.exists) {
+        showError('1', 'This phone number is not registered. Please contact your supervisor.');
+        btn.innerHTML = 'Continue →'; btn.disabled = false; return;
+      }
+
+      if (data.hasPin) {
+        document.getElementById('phone-display-ret').textContent = '📱 ' + phone;
+        showPanel('panel-2-returning');
+      } else {
+        document.getElementById('phone-display-new').textContent = '📱 ' + phone;
+        showPanel('panel-2-new');
+      }
+      updateSteps(2);
+    } catch (err) {
+      showError('1', 'Connection error. Please try again.');
+    }
+    btn.innerHTML = 'Continue →'; btn.disabled = false;
+  }
+
+  async function handleReturningLogin() {
+    const pin = document.getElementById('pin-returning').value.trim();
+    const btn = document.getElementById('returning-btn');
+    clearError('returning');
+
+    if (!pin || pin.length < 4) { showError('returning', 'Please enter your PIN.'); return; }
+
+    btn.innerHTML = '<span class="spinner"></span> Verifying...'; btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/staff/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: currentPhone.replace(/\D/g,''), pin })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        localStorage.setItem('sv_staff_token', data.token);
+        updateSteps(3); showPanel('__none__');
+        document.getElementById('success-title').textContent = 'Welcome back!';
+        document.getElementById('success-msg').textContent = 'Redirecting to your staff dashboard...';
+        document.getElementById('success-state').style.display = 'block';
+        setTimeout(() => { window.location.href = '/staff-dashboard.html'; }, 1500);
+      } else {
+        showError('returning', data.message || 'Incorrect PIN. Please try again.');
+        btn.innerHTML = 'Log In →'; btn.disabled = false;
+      }
+    } catch (err) {
+      showError('returning', 'Connection error. Please try again.');
+      btn.innerHTML = 'Log In →'; btn.disabled = false;
+    }
+  }
+
+  async function handleCreatePin() {
+    const pinNew = document.getElementById('pin-new').value.trim();
+    const pinConfirm = document.getElementById('pin-confirm').value.trim();
+    const btn = document.getElementById('create-btn');
+    clearError('new');
+
+    if (!pinNew || pinNew.length < 4) { showError('new', 'Please create a PIN of at least 4 digits.'); return; }
+    if (pinNew !== pinConfirm) { showError('new', "Your PINs don't match. Please try again."); return; }
+
+    btn.innerHTML = '<span class="spinner"></span> Saving PIN...'; btn.disabled = true;
+
+    try {
+      const res = await fetch('/api/staff/create-pin', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: currentPhone.replace(/\D/g,''), pin: pinNew })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        localStorage.setItem('sv_staff_token', data.token);
+        updateSteps(3); showPanel('__none__');
+        document.getElementById('success-title').textContent = 'PIN created!';
+        document.getElementById('success-msg').textContent = 'Your PIN has been saved. Redirecting to your staff dashboard...';
+        document.getElementById('success-state').style.display = 'block';
+        setTimeout(() => { window.location.href = '/staff-dashboard.html'; }, 1500);
+      } else {
+        showError('new', data.message || 'Could not save PIN. Please try again.');
+        btn.innerHTML = 'Create PIN & Log In →'; btn.disabled = false;
+      }
+    } catch (err) {
+      showError('new', 'Connection error. Please try again.');
+      btn.innerHTML = 'Create PIN & Log In →'; btn.disabled = false;
+    }
+  }
+
+  function goBack() {
+    showPanel('panel-1'); updateSteps(1);
+    document.getElementById('pin-returning').value = '';
+    document.getElementById('pin-new').value = '';
+    document.getElementById('pin-confirm').value = '';
+  }
+
+  function checkPinStrength(val) {
+    const len = val.length;
+    const bars = [document.getElementById('bar-1'), document.getElementById('bar-2'), document.getElementById('bar-3')];
+    const label = document.getElementById('strength-label');
+    bars.forEach(b => b.className = 'pin-bar');
+    if (len === 0) { label.textContent = 'Enter at least 4 digits'; }
+    else if (len < 4) { bars[0].classList.add('weak'); label.textContent = 'Too short'; }
+    else if (len === 4) { bars[0].classList.add('medium'); bars[1].classList.add('medium'); label.textContent = 'OK — 6 digits is stronger'; }
+ 
