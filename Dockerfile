@@ -1,28 +1,21 @@
 FROM php:8.2-apache
 
-# Enable Apache mod_rewrite for clean URLs
-RUN a2enmod rewrite
-
-# Install PHP extensions needed for MySQL
+# Install PHP MySQL extension
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Copy all app files into the Apache web root
+# Enable mod_rewrite for .htaccess routing
+RUN a2enmod rewrite
+
+# Copy all app files to web root
 COPY . /var/www/html/
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
 
-# Apache config: allow .htaccess overrides
-RUN echo '<Directory /var/www/html>\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>' > /etc/apache2/conf-available/skillvia.conf \
-    && a2enconf skillvia
+# Allow .htaccess overrides
+RUN sed -i 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
-# Railway sets PORT dynamically — tell Apache to listen on it
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-EXPOSE 80
-CMD ["docker-entrypoint.sh"]
+# Railway uses a dynamic PORT — update Apache to listen on it at startup
+CMD bash -c "sed -i \"s/Listen 80/Listen \${PORT:-80}/\" /etc/apache2/ports.conf && \
+    sed -i \"s/:80>/:\${PORT:-80}>/\" /etc/apache2/sites-enabled/000-default.conf && \
+    apache2-foreground"
