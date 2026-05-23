@@ -13,10 +13,14 @@ RUN apt-get update && apt-get install -y \
 # Remove default nginx site
 RUN rm -f /etc/nginx/sites-enabled/default
 
+# Copy all app files to web root
 COPY . /var/www/html/
-RUN chown -R www-data:www-data /var/www/html
 
-# Startup script: reads Railway's $PORT at runtime and writes nginx config on the fly
+# Fix permissions
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html
+
+# Startup: build nginx config from $PORT then launch
 CMD bash -c "\
     PORT=\${PORT:-8080} && \
     echo \"server { \
@@ -30,5 +34,6 @@ CMD bash -c "\
             fastcgi_pass unix:/run/php/php8.1-fpm.sock; \
         } \
     }\" > /etc/nginx/sites-enabled/skillvia && \
+    nginx -t && \
     service php8.1-fpm start && \
     nginx -g 'daemon off;'"
