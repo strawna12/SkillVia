@@ -1,38 +1,34 @@
-FROM php:8.2-fpm-alpine
+FROM ubuntu:22.04
 
-# Install nginx and required PHP extensions
-RUN apk add --no-cache nginx && \
-    docker-php-ext-install pdo pdo_mysql
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Write nginx config
-RUN mkdir -p /run/nginx && \
-    cat > /etc/nginx/http.d/default.conf << 'NGINX'
-server {
-    listen ${PORT:-80};
-    root /var/www/html;
-    index index.html index.php;
+RUN apt-get update && apt-get install -y \
+    php8.1 \
+    php8.1-mysql \
+    php8.1-cli \
+    php8.1-fpm \
+    nginx \
+    && rm -rf /var/lib/apt/lists/*
 
-    location / {
-        try_files $uri $uri/ =404;
-    }
+# Remove default nginx site
+RUN rm -f /etc/nginx/sites-enabled/default
 
-    location ~ ^/api/ {
-        rewrite ^/api/(.*)$ /api.php last;
-    }
-
-    location ~ \.php$ {
-        fastcgi_pass 127.0.0.1:9000;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
-}
-NGINX
-
-# Copy app files
 COPY . /var/www/html/
 RUN chown -R www-data:www-data /var/www/html
 
-# Startup: substitute PORT, start php-fpm and nginx
-CMD sh -c "sed -i \"s/\${PORT:-80}/${PORT:-80}/g\" /etc/nginx/http.d/default.conf && \
-    php-fpm -D && \
+# Startup script: reads Railway's $PORT at runtime and writes nginx config on the fly
+CMD bash -c "\
+    PORT=\${PORT:-8080} && \
+    echo \"server { \
+        listen \$PORT; \
+        root /var/www/html; \
+        index index.html index.php; \
+        location / { try_files \\\$uri \\\$uri/ =404; } \
+        location ~ ^/api/ { rewrite ^/api/(.*)$ /api.php last; } \
+        location ~ \\.php\$ { \
+            include snippets/fastcgi-php.conf; \
+            fastcgi_pass unix:/run/php/php8.1-fpm.sock; \
+        } \
+    }\" > /etc/nginx/sites-enabled/skillvia && \
+    service php8.1-fpm start && \
     nginx -g 'daemon off;'"
